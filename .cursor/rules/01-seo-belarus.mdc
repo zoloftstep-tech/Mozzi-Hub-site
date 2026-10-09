@@ -1,0 +1,129 @@
+---
+description: Technical SEO and Local SEO for Belarus — agent setup for new web projects
+globs: ["**/*.{js,ts,jsx,tsx,html,mdx}"]
+alwaysApply: false
+---
+
+# SEO — Belarus (agent setup)
+
+Apply this rule only when it is present in the project's `.cursor/rules/`. Do not invent Belarus-specific legal or hosting constraints beyond what is written here or in the project brief (ТЗ).
+
+When scaffolding or improving a site, implement SEO as code defaults first; leave Webmaster/Ads account clicks to the human unless asked.
+
+## 0. Setup checklist (new project)
+
+Do these in order unless ТЗ says otherwise:
+
+1. Fix **one canonical host** (`https://www.example.by` or `https://example.by`) — use it everywhere: `metadataBase`, sitemap, canonical, Open Graph, Schema `url`.
+2. Redirect the other host to the canonical (hosting/DNS/CDN). Do not leave both indexable as equals.
+3. `robots.txt`: `Allow` public pages, `Disallow` private/API if needed, `Sitemap:`, and for Yandex optionally `Host: https://canonical-host` (full HTTPS URL of the main mirror).
+4. Dynamic `sitemap.xml` with only indexable URLs (no thank-you / private / draft pages).
+5. Per-page unique `title` + `description` + canonical; one `<h1>` per page.
+6. JSON-LD: Organization/LocalBusiness on home/contacts; BreadcrumbList on inner pages; FAQ/Product when real content exists.
+7. Verification: Google Search Console + Yandex.Webmaster — prefer **meta tag** in site metadata (do not invent codes; use placeholders like `REPLACE_YANDEX_VERIFICATION` until the owner provides values). Prefer meta over DNS when `www` is a **CNAME** (TXT on `www` often conflicts with CNAME).
+8. Analytics: load marketing tags (gtag / Metrica) **only after cookie consent** if the site sets marketing cookies.
+9. Local NAP: phone `+375`, address with «Республика Беларусь» when local; Yandex Maps unless ТЗ asks for Google Maps.
+10. Custom `404` with links to home and key sections.
+
+## Technical SEO
+
+- Use semantic HTML (`<header>`, `<nav>`, `<main>`, `<article>`, `<section>`, `<footer>`).
+- Keep a strict heading hierarchy: one `<h1>`, then `<h2>` / `<h3>` without skipping levels.
+- Prefer clean kebab-case URLs; avoid query parameters for primary content URLs when possible.
+- Include `<link rel="canonical" href="..." />` on every indexable page (absolute URL via site base).
+- Always provide meaningful `alt` on images; set `width` and `height` (or equivalent CSS aspect-ratio) to reduce CLS.
+- Use `font-display: swap` for custom fonts.
+- Use `loading="lazy"` for below-the-fold images and iframes; keep LCP/hero media eager.
+- Mark non-indexable flows (`/thanks`, `/spasibo`, account areas) with `robots: { index: false }`.
+
+## Language and locale
+
+- Default content language: Russian (`ru`). Set `<html lang="ru">` (or `lang="ru-BY"` when explicitly targeting Belarus locale).
+- For multilingual sites, add correct `hreflang` (e.g. `ru-BY`, `be-BY`, `en-BY`) plus `x-default` when there is a clear default.
+- Prefer Yandex Maps embeds/links unless the brief explicitly asks for Google Maps.
+
+## Metadata and social
+
+- Unique `<title>` and `<meta name="description">` per page. Aim for roughly ≤60 / ≤155 characters, but prioritize clarity and CTR over hard truncation.
+- Commercial landings: put intent in title/H1/intro where natural (`купить`, city, product) — no keyword stuffing.
+- Add Open Graph and Twitter Card tags: `og:title`, `og:description`, `og:image`, `og:url`, and a fitting `og:type` (`website` for general pages, `article` for articles/posts, `product` when relevant).
+- Provide favicon assets (`favicon.ico`, `apple-touch-icon.png`, and a web manifest when the stack supports it).
+
+## Belarus local SEO
+
+- Format phones with country code `+375` and make them clickable:
+  `<a href="tel:+375XXXXXXXXX">+375 (XX) XXX-XX-XX</a>`.
+- Show physical addresses clearly, including country («Республика Беларусь») when the business is local.
+- Prefer `.by` or `.бел` for local Belarus projects when choosing or recommending a domain.
+- Hosting / Decree No. 60: if the brief does not specify hosting, briefly remind that Belarusian legal entities serving local users often prefer Belarus-based hosting for production; do not block or refuse cloud options (Vercel, Netlify, etc.) unless the brief requires local hosting. Follow the ТЗ when it is explicit.
+
+## Structured data (Schema.org)
+
+- Add valid, minimal JSON-LD — only types that match the page; no empty or duplicate graphs.
+- Homepage / contacts: `Organization` or `LocalBusiness` (consistent NAP with visible contacts).
+- Multi-level navigation: `BreadcrumbList`.
+- Products / services: `Product` and/or `Offer` with prices in `BYN` when priced in Belarusian rubles.
+- Q&A blocks: `FAQPage`.
+- Prefer markup that validates in Google’s Rich Results / Schema checks; keep Yandex-compatible fields when they overlap.
+
+## robots.txt and crawlers
+
+- Keep `robots.txt` **classic and boring** so both Google and Yandex validators pass.
+- **Do not** put `Content-Signal:` in `robots.txt` — Yandex Webmaster flags it as an unknown directive and it can block trust/checks; Google often ignores it anyway.
+- Do not invent exotic directives. Unknown lines risk Yandex errors.
+- Example shape:
+
+```text
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://www.example.by/sitemap.xml
+Host: https://www.example.by
+```
+
+- `Host:` is Yandex-oriented (main mirror). It must match the real canonical host and HTTPS redirects.
+- If AI-crawler policy is required, use explicit `User-agent:` blocks for named bots in ТЗ — not Content-Signal in robots.
+
+## Search Console / Webmaster (human + agent)
+
+- Optimize primarily for **Google**; also keep pages clean for **Yandex**.
+- Yandex often picks one **main mirror** (`www` vs non-`www`). Align site canonical, redirects, sitemap, and `Host:` with that choice before verification fights.
+- Verification codes: never invent; use env/config or placeholders. Next.js example:
+
+```ts
+verification: {
+  yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION ?? "",
+  google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "",
+}
+```
+
+- After deploy: owner requests indexing of key URLs in Google Search Console; submits sitemap in both GSC and Yandex.Webmaster.
+
+## Cookies, analytics, ads
+
+- If the site loads Google Ads/Analytics, Metrica, or pixels: show a cookie banner; load tags only after accept (or as ТЗ requires).
+- Do not hardcode live Ads conversion IDs as the only path without env overrides when the stack already uses env.
+- Conversion pages stay `noindex` when they are thank-you pages.
+
+## Forms / personal data (BY-oriented UX)
+
+- On lead/order forms: required explicit consent checkbox for personal data processing, linked to policy docs; validate on server too.
+- Do not rely only on “by clicking submit you agree” text.
+
+## Landings and internal links
+
+- For commercial demand, prefer dedicated landings (city, product type, marketplace) with unique copy — not thin duplicates.
+- Link landings from footer / relevant sections / 404; include them in sitemap.
+- CTA should point to the real conversion path (calculator, form, contacts).
+
+## Performance
+
+- Defer non-critical third-party scripts via `defer` / `async` or framework helpers (e.g. `next/third-parties`).
+- Prefer modern image formats (WebP/AVIF) and framework image optimization (e.g. `next/image`) when available.
+
+## Agent do / don't
+
+**Do:** implement canonical host, robots, sitemap, metadata, JSON-LD, 404, consent UX, verification placeholders, local NAP.
+
+**Don't:** invent verification codes; add Content-Signal to robots; force foreign hosting bans without ТЗ; keyword-stuff titles; index thank-you pages; claim stock/SEO rankings as guaranteed.

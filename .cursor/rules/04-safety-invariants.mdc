@@ -1,0 +1,102 @@
+---
+description: Universal safety invariants — where "least code, least change" does not apply, and how to behave when there is no test suite and no second reviewer
+globs: ["**/*.{js,ts,jsx,tsx,sql,py,prisma}"]
+alwaysApply: true
+---
+
+# Safety invariants (apply to any project)
+
+The project defaults ("least code," "avoid premature abstraction," "flat
+structure") are correct almost everywhere. This file defines the exceptions:
+places where minimalism must yield to explicitness, and a default behavior for
+working without a test suite or a second developer to catch regressions.
+
+## 1. Trust boundaries and money logic are never simplified away
+
+Some code exists specifically to prevent a costly failure, not because of
+over-engineering. Do not remove, inline, or "simplify" a step in:
+
+- Any calculation that determines a price, cost, discount, tax, payout, or
+  balance shown to a user or used for a transaction.
+- Any input validation at a boundary where the caller is external, untrusted,
+  or a different service/process (API request bodies, webhook payloads, form
+  submissions, file uploads, query params).
+- Any authentication or authorization check.
+- Any step that prevents duplicate writes (idempotency keys, unique
+  constraints, dedupe checks) on mutations that create records or move money/state.
+
+If a task seems to require touching one of these, treat "fewer lines" as a
+non-goal for that specific change. Prefer one extra explicit line over a
+clever one-liner that silently drops a check. When in doubt, ask before
+removing a check rather than assuming it was dead code.
+
+## 2. One canonical implementation per business rule
+
+If the same calculation, formula, or business rule could plausibly be
+duplicated across files, layers, or repos (for resilience, caching, or
+offline fallback), identify which copy is canonical and which is a fallback,
+and say so explicitly in the change. Never let a "fallback" or "cached" copy
+silently drift from the canonical one — if you change the canon, call out
+that the fallback needs the same change as a separate, visible step, even
+if updating it is out of scope for the current task.
+
+## 3. Layered auth/gating must be checked for ordering conflicts
+
+When a codebase has more than one way to authenticate a request (e.g. session
+cookie for browser users, API key/bearer token for server-to-server calls,
+webhook signing secret for third-party callbacks), a shared middleware or
+guard can accidentally gate all of them with the wrong check first — silently
+breaking one auth path while looking correct for the others.
+
+Whenever adding, editing, or reordering middleware/guards that sit in front of
+multiple routes:
+- List which routes use which auth mechanism before changing shared logic.
+- Confirm machine-to-machine and webhook routes are not blocked by a check
+  meant only for interactive/browser sessions, and vice versa.
+- If unsure which routes are affected, ask rather than assuming the existing
+  matcher/config is exhaustive.
+
+## 4. Infrastructure swaps near auth/session/payment code require an explicit warning, not a silent change
+
+Changes framed as "performance" or "best practice" — swapping a DB driver,
+connection pooling strategy, ORM adapter, session store, or serialization
+format — can break authentication or data integrity in ways that only show up
+in production, not locally. Before making such a change near auth, session, or
+payment-adjacent code:
+- State plainly what could break and why (e.g. "this changes how sessions are
+  read; recommend testing login before merging to main").
+- Prefer proposing the change as a separate, isolated step the user can test
+  and revert independently, rather than bundling it with an unrelated fix.
+
+## 5. Cross-service and cross-repo contracts are called out, never assumed synced
+
+If a change touches a request/response shape, environment variable name,
+shared secret, or webhook payload that crosses a boundary into another
+service, repo, or deployment (even one not currently open in the editor):
+- Name explicitly which other codebase(s) also need a matching update.
+- Do not assume another repo will "just pick up" the change — treat every
+  other service as being on its own release cycle unless told otherwise.
+- Do not rename or restructure a shared field "for clarity" without flagging
+  that every consumer of that field needs the same update.
+
+## 6. Default behavior when there is no test suite and no second reviewer
+
+Many of these projects are maintained solo, often by someone without a deep
+engineering background, with no automated tests and no code review. Compensate
+for that directly:
+
+- Before editing any file that touches auth, payments/pricing, database
+  migrations, middleware, or a cross-service contract, state in plain language
+  what could break and for whom (which user, which workflow) — even if not
+  asked. The explanation is the safety net that a test suite or reviewer would
+  normally provide.
+- Prefer changes that are easy to verify manually in under a minute (a specific
+  input to try, a specific screen to check) over changes whose correctness can
+  only be confirmed by reading the code.
+- When fixing a narrow bug, do not opportunistically refactor, rename, or
+  reformat surrounding code in the same change — a wider diff is harder for a
+  non-specialist to sanity-check.
+- If the project has a running log of past incidents or "do not do X, it broke
+  Y before" notes (in any file, e.g. `OPS.md`, `KNOWN-ISSUES.md`, README, or
+  project-specific rules), treat it as higher priority than general best
+  practice and check it before touching related code.
