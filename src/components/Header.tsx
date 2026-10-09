@@ -8,9 +8,17 @@ export function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-5 md:px-8">
         <a
           href="#top"
-          className="font-display text-lg font-bold tracking-tight text-white md:text-xl"
+          className="inline-flex items-center gap-2.5 font-display text-lg font-bold tracking-tight text-white md:gap-3 md:text-xl"
         >
-          {SITE_NAME}
+          <img
+            src="/logo.png"
+            alt=""
+            width={36}
+            height={34}
+            className="h-8 w-auto md:h-9"
+            decoding="async"
+          />
+          <span>{SITE_NAME}</span>
         </a>
 
         <nav className="hidden items-center gap-7 text-sm font-medium text-white/85 lg:flex" aria-label="Основная навигация">
