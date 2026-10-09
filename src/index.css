@@ -94,3 +94,120 @@
 .animate-fade {
   animation: fade-in 0.8s ease both;
 }
+
+/* Hero: lightweight 3D-printer + heart print */
+.printer-scene {
+  width: min(100%, 22rem);
+  aspect-ratio: 280 / 260;
+}
+
+.printer-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.printer-gantry {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: printer-gantry-y 4.5s ease-in-out infinite;
+}
+
+.printer-head {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: printer-head-x 1.5s ease-in-out infinite;
+}
+
+.printer-filament {
+  animation: printer-filament 1.5s ease-in-out infinite;
+}
+
+.printer-heart-fill {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: printer-heart-build 4.5s ease-in-out infinite;
+}
+
+/* Start low near the bed, rise while printing, then reset down. */
+@keyframes printer-gantry-y {
+  0%,
+  8% {
+    transform: translateY(78px);
+  }
+  48% {
+    transform: translateY(0);
+  }
+  58% {
+    transform: translateY(0);
+  }
+  92%,
+  100% {
+    transform: translateY(78px);
+  }
+}
+
+@keyframes printer-head-x {
+  0%,
+  100% {
+    transform: translateX(-28px);
+  }
+  50% {
+    transform: translateX(28px);
+  }
+}
+
+@keyframes printer-filament {
+  0%,
+  100% {
+    opacity: 0.25;
+    stroke-dasharray: 2 6;
+  }
+  50% {
+    opacity: 0.9;
+    stroke-dasharray: 6 2;
+  }
+}
+
+/* Fill from bottom as the nozzle rises (same window as gantry ascent). */
+@keyframes printer-heart-build {
+  0%,
+  8% {
+    clip-path: inset(100% 0 0 0);
+    opacity: 0.45;
+  }
+  48% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+  58% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+  92%,
+  100% {
+    clip-path: inset(100% 0 0 0);
+    opacity: 0.45;
+  }
+}
+
+@media (max-width: 767px) {
+  .printer-scene {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .printer-gantry,
+  .printer-head,
+  .printer-filament,
+  .printer-heart-fill {
+    animation: none !important;
+  }
+
+  .printer-heart-fill {
+    clip-path: none;
+    opacity: 1;
+  }
+}
