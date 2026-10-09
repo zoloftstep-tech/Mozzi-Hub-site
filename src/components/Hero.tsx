@@ -13,7 +13,7 @@ export function Hero() {
   return (
     <section
       id="top"
-      className="relative flex min-h-[100svh] items-center overflow-hidden bg-ink text-white"
+      className="relative flex min-h-[100svh] items-start overflow-hidden bg-ink text-white"
     >
       <div
         className="absolute inset-0 bg-[radial-gradient(120%_80%_at_70%_20%,#3a4254_0%,#1a1d26_45%,#12141a_100%)]"
@@ -28,7 +28,7 @@ export function Hero() {
         aria-hidden
       />
 
-      <div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-8 px-5 pb-14 pt-24 md:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] md:gap-10 md:px-8 md:pb-20 md:pt-28">
+      <div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-8 px-5 pb-16 pt-24 md:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] md:gap-10 md:px-8 md:pb-24 md:pt-28">
         <div>
           <p className="animate-rise font-display text-sm font-semibold uppercase tracking-[0.2em] text-accent md:text-base">
             {SITE_NAME}
