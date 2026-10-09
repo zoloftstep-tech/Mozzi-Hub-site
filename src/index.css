@@ -192,12 +192,6 @@
   }
 }
 
-@media (max-width: 767px) {
-  .printer-scene {
-    display: none;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .printer-gantry,
   .printer-head,
