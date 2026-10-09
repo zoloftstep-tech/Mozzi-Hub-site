@@ -35,8 +35,8 @@ export function PrinterHeart() {
           stroke="rgba(255,255,255,0.15)"
         />
 
-        {/* Heart being printed (layer reveal) */}
-        <g className="printer-heart">
+        {/* Heart being printed — slightly smaller, bottom near bed */}
+        <g className="printer-heart" transform="translate(140 190) scale(0.84) translate(-140 -188)">
           <path
             className="printer-heart-fill"
             d="M140 188c-4-8-36-32-52-52-14-18-12-40 6-52 14-10 32-6 40 8 8-14 26-18 40-8 18 12 20 34 6 52-16 20-48 44-52 52z"
@@ -50,26 +50,27 @@ export function PrinterHeart() {
           />
         </g>
 
-        {/* Moving gantry + nozzle */}
+        {/* Moving gantry + nozzle — home (top) tip ≈ heart top */}
         <g className="printer-gantry">
           <rect
             x="60"
-            y="70"
+            y="58"
             width="160"
             height="6"
             rx="2"
             fill="rgba(255,255,255,0.35)"
           />
           <g className="printer-head">
-            <rect x="128" y="64" width="24" height="18" rx="3" fill="#c8ccd4" />
-            <rect x="134" y="82" width="12" height="16" rx="2" fill="#9aa0ab" />
-            <polygon points="140,98 134,110 146,110" fill="#e85d04" />
+            <rect x="128" y="52" width="24" height="16" rx="3" fill="#c8ccd4" />
+            <rect x="134" y="68" width="12" height="14" rx="2" fill="#9aa0ab" />
+            {/* Compact nozzle tip (not a decorative arrow) */}
+            <rect x="137" y="82" width="6" height="8" rx="1" fill="#6b7280" />
             <line
               className="printer-filament"
               x1="140"
-              y1="110"
+              y1="90"
               x2="140"
-              y2="130"
+              y2="104"
               stroke="#e85d04"
               strokeWidth="2"
               strokeLinecap="round"
