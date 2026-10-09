@@ -28,7 +28,7 @@ export function Hero() {
         aria-hidden
       />
 
-      <div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-8 px-5 pb-16 pt-24 md:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] md:gap-10 md:px-8 md:pb-24 md:pt-28">
+      <div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-8 px-5 pb-16 pt-20 md:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] md:gap-10 md:px-8 md:pb-24 md:pt-24">
         <div>
           <p className="animate-rise font-display text-sm font-semibold uppercase tracking-[0.2em] text-accent md:text-base">
             {SITE_NAME}
